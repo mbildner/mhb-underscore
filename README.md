@@ -1,4 +1,4 @@
 mhb-underscore
 ==============
 
-My own implementation of Underscore.js in JavaScript
+My own implementation of [Underscore.js](http://underscorejs.org/) in JavaScript
