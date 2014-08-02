@@ -1,29 +1,207 @@
 var _ = require('../mhb-underscore.js');
 
 describe('Collections', function () {
-  it('should invoke a callback on each value in an object', function () {
-    var labels = '';
-    var counter = 0;
-    var additionObj = {
-      one: 1,
-      seven: 7,
-      negFive: -5
-    };
+    var testObj;
+    var testArr;
 
-    _.each(additionObj, function (num, label) {
-      counter += num;
+    function noOp () {};
+
+    var parent = {inheritableProp: true};
+    function Child () {};
+    Child.prototype = parent;
+
+    beforeEach(function () {
+      testArr = [
+        'Moshe Bildner',
+        'mbildner',
+        'mbildner',
+        'New York City'
+      ];
+
+      testObj = {
+        name: 'Moshe Bildner',
+        username: 'mbildner',
+        twitter: 'mbildner',
+        city: 'New York City'
+      };
+
+      testStr = 'moshe bildner';
     });
 
-    expect(counter).toBe(3);
 
-    _.each(additionObj, function (num, label) {
-      labels += label;
+  describe('map', function () {
+    it('should return Array of the return of callback executed on every (character, indx) pair in a String', function () {
+      var targetArr = _.map(testStr, function (character, indx) {
+        return character;
+      });
+
+      expect(targetArr).toEqual(testStr.split(''));
+
     });
 
-    expect(labels).toBe('onesevennegFive');
+    it('should return Array of the return of callback on every (item, indx) pair in an Array', function () {
+      var targetArr = _.map(testArr, function (item, indx) {
+        return item;
+      });
+
+      expect(targetArr).toEqual(testArr);
+    });
+
+    it('should return Array of the return of callback on every (value, key) pair in an Object', function () {
+      var targetArr = _.map(testObj, function (val, key) {
+        return val;
+      });
+
+      expect(targetArr).toEqual([
+        'Moshe Bildner',
+        'mbildner',
+        'mbildner',
+        'New York City'
+      ]);
+    });
+
+    it('should ignore inherited properties in an Object', function () {
+      var child = new Child();
+
+      var targetObj = _.map(child, function (val, key) {
+        return val;
+      });
+
+      expect(targetObj).toEqual({});
+    });
+
+
+    it('should execute callback against context, if provided', function () {
+      var context = {
+        upperCaser: function (str) {return str.toUpperCase();}
+      };
+
+      var targetObj = _.map(testObj, function (val, key) {
+        return this.upperCaser(val);
+      }, context);
+
+      var targetStr = _.map(testStr, function (character, indx) {
+        return this.upperCaser(character);
+      }, context);
+
+      var targetArr = _.map(testArr, function (item, indx) {
+        return this.upperCaser(item);
+      }, context);
+
+      expect(targetObj).toEqual([
+        'MOSHE BILDNER',
+        'MBILDNER',
+        'MBILDNER',
+        'NEW YORK CITY'
+      ]);
+
+      expect(targetStr).toEqual([
+        'M', 'O', 'S', 'H', 'E', ' ', 'B', 'I', 'L', 'D', 'N', 'E', 'R'
+      ]);
+
+      expect(targetArr).toEqual([
+        'MOSHE BILDNER',
+        'MBILDNER',
+        'MBILDNER',
+        'NEW YORK CITY'
+      ]);
+
+    });
+
 
   });
 
+
+  describe('each', function () {
+    it('should execute callback on every (character, indx) pair in a String', function () {
+      var targetStr = '';
+
+      _.each(testStr, function (character, indx) {
+        targetStr += character;
+      });
+
+      expect(targetStr).toBe(testStr);
+
+    });
+
+    it('should execute callback on every (item, indx) pair in an Array', function () {
+      var targetArr = [];
+
+      _.each(testArr, function (item, indx) {
+        targetArr[indx] = item;
+      });
+
+      expect(targetArr).toEqual(testArr);
+
+    });
+
+    it('should execute callback on every (value, key) pair in an Object', function () {
+      var targetObj = {};
+
+      _.each(testObj, function (val, key) {
+        targetObj[key] = val;
+      });
+
+      expect(targetObj).toEqual(testObj);
+    });
+
+    it('should ignore inherited properties in an Object', function () {
+      var child = new Child();
+
+      var targetObj = {};
+
+      _.each(child, function (val, key) {
+        targetObj[key] = val;
+      });
+
+      expect(targetObj).toEqual({});
+
+    });
+
+    it('should execute callback against context, if provided', function () {
+      var context = {
+        upperCaser: function (str) {return str.toUpperCase();}
+      };
+
+      var targetObj = {};
+      var targetArr = [];
+
+      _.each(testObj, function (val, key) {
+        targetObj[this.upperCaser(key)] = this.upperCaser(val);
+      }, context);
+
+      _.each(testArr, function (item, indx) {
+        targetArr[indx] = this.upperCaser(item);
+      }, context);
+
+      expect(targetObj).toEqual({
+        NAME: 'MOSHE BILDNER',
+        USERNAME: 'MBILDNER',
+        TWITTER: 'MBILDNER',
+        CITY: 'NEW YORK CITY'
+      });
+
+      expect(targetArr).toEqual([
+        'MOSHE BILDNER',
+        'MBILDNER',
+        'MBILDNER',
+        'NEW YORK CITY'
+      ]);
+
+    });
+
+    it('should return the provided list', function () {
+      expect(_.each(testStr, noOp)).toBe(testStr);
+      expect(_.each(testStr, noOp), {}).toBe(testStr);
+
+      expect(_.each(testObj, noOp)).toBe(testObj);
+      expect(_.each(testObj, noOp), {}).toBe(testObj);
+
+      expect(_.each(testArr, noOp)).toBe(testArr);
+      expect(_.each(testArr, noOp), {}).toBe(testArr);
+    });
+
+  });
 
 });
 
@@ -61,6 +239,7 @@ describe('Objects', function () {
     });
 
     it('should filter out inherited properties', function () {
+      // move inheriting Constructor to beforeEach so other tests can use it
       var parent = {name: 'PARENT'};
       function Child () {
         this.ownName = 'CHILD'

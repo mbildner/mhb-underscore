@@ -49,13 +49,20 @@ function pairs (object) {
 }
 
 function each (list, callback, context) {
+  var savedReference = list;
+
   if (context) {
     callback = callback.bind(context);
+  }
+
+  if (isString(list)) {
+    list = list.split('');
   }
 
   if (isArray(list)) {
     list.forEach(callback);
   }
+
   else if (isObject(list)) {
     var kvPairs = pairs(list);
 
@@ -67,6 +74,22 @@ function each (list, callback, context) {
         callback.apply(null, vkArr);
       });
   }
+
+  return savedReference;
+}
+
+function map (list, callback, context) {
+  var collector = [];
+
+  if (context) {
+    callback = callback.bind(context);
+  }
+
+  each(list, function (val, key) {
+    collector.push(callback.call(null, val, key));
+  });
+
+  return collector;
 }
 
 
@@ -78,5 +101,6 @@ module.exports = {
   isArray: isArray,
   isString: isString,
   pairs: pairs,
-  each: each
+  each: each,
+  map: map
 };
