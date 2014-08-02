@@ -29,6 +29,47 @@ describe('Collections', function () {
     });
 
 
+  describe('reduce', function () {
+    it('should return reduced Objects', function () {
+      var reducedObj = _.reduce(testObj, function (collector, next) {
+        return collector + next;
+      }, '');
+
+      var manuallyReducedObj = _.map(testObj, function (item) {
+        return item;
+      }).join('');
+
+      expect(reducedObj).toBe(manuallyReducedObj);
+
+    });
+
+    it('should return reduced Arrays', function () {
+      var reducedArr = _.reduce(testArr, function (collector, next) {
+        return collector + next;
+      }, '');
+
+      var manuallyReducedArr = testArr.join('');
+
+      expect(reducedArr).toBe(manuallyReducedArr);
+
+    });
+
+    it('should return reduced Strings', function () {
+
+    });
+
+    it('should ignore inherited properties in an Object', function () {
+
+    });
+
+    it('should executed callback against context, if provided', function () {
+
+    });
+
+  });
+
+
+
   describe('map', function () {
     it('should return Array of the return of callback executed on every (character, indx) pair in a String', function () {
       var targetArr = _.map(testStr, function (character, indx) {

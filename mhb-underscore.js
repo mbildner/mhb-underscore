@@ -48,6 +48,7 @@ function pairs (object) {
 
 }
 
+// each should provide whole list with (key, val) pair
 function each (list, callback, context) {
   var savedReference = list;
 
@@ -93,6 +94,19 @@ function map (list, callback, context) {
 }
 
 
+function reduce (list, callback, initial, context) {
+  if (context) {
+    callback = callback.bind(context);
+  }
+
+  each(list, function (val, key) {
+
+  });
+
+  return initial;
+
+}
+
 
 module.exports = {
   isBoolean: isBoolean,
@@ -102,5 +116,6 @@ module.exports = {
   isString: isString,
   pairs: pairs,
   each: each,
-  map: map
+  map: map,
+  reduce: reduce
 };
